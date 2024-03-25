@@ -1,0 +1,19 @@
+version: '3'
+
+services:
+  backend:
+    build: ./real-time-chat-backend-flask
+    ports:
+      - "5000:5000"
+    depends_on:
+      - mongo
+
+  frontend:
+    build: ./real-time-chat-frontend
+    ports:
+      - "3000:3000"
+
+  mongo:
+    image: "mongo:latest"
+    ports:
+      - "27017:27017"
