@@ -1,6 +1,5 @@
 venv/
 .DS_Store
-real-time-chat-frontend/node_modules/
 
 # Ignore any log files
 *.log
