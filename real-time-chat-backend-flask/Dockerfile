@@ -6,7 +6,7 @@ WORKDIR /app
 
 # Copy the content of the local directory to the working directory
 COPY . /app
-
+COPY real-time-chat-backend-flask /app/real-time-chat-backend-flask
 # Install Python dependencies
 COPY requirements.txt /app/
 RUN pip install --no-cache-dir -r requirements.txt
