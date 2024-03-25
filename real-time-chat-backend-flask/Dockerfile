@@ -1,0 +1,17 @@
+# Use the official Python image from the Docker Hub
+FROM python:3.11-slim
+
+# Set the working directory in the container
+WORKDIR /app
+
+# Copy the content of the local src directory to the working directory
+COPY . .
+
+# Install Python dependencies
+RUN pip install -r requirements.txt
+
+# Expose the port the app runs on
+EXPOSE 5000
+
+# Run the command to start the app
+CMD ["python", "app.py"]
