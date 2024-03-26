@@ -5,10 +5,9 @@ FROM python:3.11-slim
 WORKDIR /app
 
 # Copy the content of the local directory to the working directory
-COPY . /app
-COPY real-time-chat-backend-flask /app/real-time-chat-backend-flask
+COPY . .
+
 # Install Python dependencies
-COPY requirements.txt /app/
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Expose the port the app runs on

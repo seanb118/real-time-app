@@ -3,32 +3,30 @@ from flask_socketio import SocketIO, send, emit
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager, jwt_required, create_access_token, get_jwt_identity
 from flask_bcrypt import Bcrypt
-from pymongo import MongoClient
 import pymongo
-
 
 
 app = Flask(__name__)
 CORS(app)
 app.config['SECRET_KEY'] = 'your-secret-key'
 app.config['JWT_SECRET_KEY'] = 'jwt-secret-key'
+
 socketio = SocketIO(app, cors_allowed_origins="*")
 jwt = JWTManager(app)
 bcrypt = Bcrypt(app)
 
-try:
-    conn = pymongo.MongoClient('localhost', 27017)
-    db = conn.test_database
-    print("MongoDB connected:", db)
-    print("Available collections:", db.list_collection_names())
-except Exception as e:
-    print("Error connecting to MongoDB:", e)
 
-
+# Define get_db function to retrieve a database instance
+def get_db():
+    client = pymongo.MongoClient('mongo', 27017)
+    return client.test_database
 
 
 @app.route('/user_register', methods=['POST'])
 def user_register():
+    db = get_db()
+    users_collection = db.users
+
     username = request.json.get('username')
     password = request.json.get('password')
 
@@ -44,6 +42,8 @@ def user_register():
 
 @app.route('/login', methods=['POST'])
 def login():
+    db = get_db()
+    users_collection = db.users
     username = request.json.get('username')
     password = request.json.get('password')
 
@@ -59,6 +59,9 @@ def login():
 @socketio.on('message')
 @jwt_required()
 def handle_message(data):
+    db = get_db()
+    messages_collection = db.messages
+
     message = data['message']
     username = get_jwt_identity()
 

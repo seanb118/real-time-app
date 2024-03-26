@@ -4,7 +4,7 @@ services:
   backend:
     build: ./real-time-chat-backend-flask
     ports:
-      - "5000:5000"
+      - "5001:5000"
     depends_on:
       - mongo
 
@@ -15,5 +15,10 @@ services:
 
   mongo:
     image: "mongo:latest"
+    healthcheck:
+      test: ["CMD", "mongo", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
     ports:
       - "27017:27017"
