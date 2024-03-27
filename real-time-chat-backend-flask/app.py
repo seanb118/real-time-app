@@ -7,7 +7,8 @@ import pymongo
 
 
 app = Flask(__name__)
-CORS(app)
+# Replace app with your Flask app variable
+CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}})
 app.config['SECRET_KEY'] = 'your-secret-key'
 app.config['JWT_SECRET_KEY'] = 'jwt-secret-key'
 
@@ -49,11 +50,18 @@ def login():
 
     user = users_collection.find_one({'username': username})
 
-    if user and bcrypt.check_password_hash(user['password'], password):
-        access_token = create_access_token(identity=username)
-        return jsonify({'access_token': access_token}), 200
+    if user:
+        stored_hashed_password = user['password']
+        print(f"Stored Hashed Password: {stored_hashed_password}")  # Print the stored hashed password
 
-    return jsonify({'message': 'Invalid credentials!'}), 401
+        password_check_result = bcrypt.check_password_hash(stored_hashed_password, password)
+        print(f"Password Check Result: {password_check_result}")  # Print the result of the password check
+
+        if password_check_result:
+            access_token = create_access_token(identity=username)
+            return jsonify({'access_token': access_token}), 200
+
+    return jsonify({'message': 'Invalid credentials! Message is from Backend lmao'}), 401
 
 
 @socketio.on('message')
@@ -71,4 +79,4 @@ def handle_message(data):
 
 
 if __name__ == '__main__':
-    socketio.run(app, debug=True)
+    socketio.run(app, host='0.0.0.0', debug=True)

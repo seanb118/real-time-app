@@ -11,12 +11,14 @@ const AuthPage = ({ setToken }) => {
         e.preventDefault();
 
         try {
-            const response = await axios.post('http://localhost:5000/login', { username, password });
+            console.log(`Attempting to login with username: ${username}, password: ${password}`);
+            const response = await axios.post('http://localhost:5001/login', { username, password });
             const token = response.data.access_token;
             setToken(token);
             setMessage('Login successful');
         } catch (error) {
-            setMessage('Invalid credentials');
+            console.log(error.response.data);
+            setMessage(`Invalid credentials. ${error.message}`);
         }
     };
 
@@ -24,7 +26,8 @@ const AuthPage = ({ setToken }) => {
         e.preventDefault();
 
         try {
-            await axios.post('http://localhost:5000/user_register', { username, password });
+            console.log(`Attempting to register with username: ${username}, password: ${password}`);
+            await axios.post('http://localhost:5001/user_register', { username, password });
             setMessage('Registration successful');
         } catch (error) {
             setMessage('Username already exists!');

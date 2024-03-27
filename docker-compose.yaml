@@ -14,7 +14,7 @@ services:
       - "3000:3000"
 
   mongo:
-    image: "mongo:latest"
+    image: "mongo:4.2"
     healthcheck:
       test: ["CMD", "mongo", "--eval", "db.adminCommand('ping')"]
       interval: 10s
