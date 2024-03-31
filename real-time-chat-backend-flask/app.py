@@ -4,9 +4,19 @@ from flask_cors import CORS
 from flask_jwt_extended import JWTManager, jwt_required, create_access_token, get_jwt_identity
 from flask_bcrypt import Bcrypt
 import pymongo
+import json
+
+
+class CustomJSONEncoder(json.JSONEncoder):
+    def default(self, obj):
+        # Custom JSON encoding logic
+        if isinstance(obj, YourCustomClass):
+            return obj.to_json()
+        return super().default(obj)
 
 
 app = Flask(__name__)
+app.json_encoder = CustomJSONEncoder
 # Replace app with your Flask app variable
 CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}})
 app.config['SECRET_KEY'] = 'your-secret-key'
@@ -60,22 +70,39 @@ def login():
         if password_check_result:
             access_token = create_access_token(identity=username)
             return jsonify({'access_token': access_token}), 200
+            
+        else:
+            return jsonify({'message': f'Password is incorrect for user: {username}'}), 401
 
-    return jsonify({'message': 'Invalid credentials! Message is from Backend lmao'}), 401
+    return jsonify({'message': 'Invalid credentials!'}), 401
 
 
 @socketio.on('message')
+@app.route('/messages', methods=['POST'])
 @jwt_required()
-def handle_message(data):
+def handle_message():
+    username = get_jwt_identity()
+    endpoint = f'/{username}/messages'  # Unique endpoint based on username
+
     db = get_db()
     messages_collection = db.messages
 
-    message = data['message']
-    username = get_jwt_identity()
+    message = request.json.get('message')
+    
+    if not message:
+        return jsonify({'error': 'Message content is required'}), 400
 
     messages_collection.insert_one({'message': message, 'username': username})
 
-    send(data, broadcast=True)
+    send({'message': message, 'username': username}, broadcast=True)
+
+    return jsonify({'message': 'Message sent successfully'}), 200
+
+
+@app.route('/token')
+def get_token():
+    # Logic to generate and return a JWT token
+    return jsonify({'token': create_access_token(identity='test_user')})
 
 
 if __name__ == '__main__':
