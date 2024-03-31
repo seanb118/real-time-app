@@ -6,38 +6,36 @@ const AuthPage = ({ setToken }) => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [message, setMessage] = useState('');
+    const [showPassword, setShowPassword] = useState(false);
+    const [isRegistering, setIsRegistering] = useState(false);
 
-    const handleLogin = async (e) => {
+    const handleFormSubmit = async (e) => {
         e.preventDefault();
 
         try {
-            console.log(`Attempting to login with username: ${username}, password: ${password}`);
-            const response = await axios.post('http://localhost:5001/login', { username, password });
-            const token = response.data.access_token;
-            setToken(token);
-            setMessage('Login successful');
+            const endpoint = isRegistering ? 'user_register' : 'login';
+            const response = await axios.post(`http://localhost:5001/${endpoint}`, { username, password });
+            const data = response.data;
+
+            if (response.status === 200) {
+                setToken(data.access_token);
+                setMessage('Operation successful');
+            } else {
+                setMessage(data.message);
+            }
         } catch (error) {
-            console.log(error.response.data);
-            setMessage(`Invalid credentials. ${error.message}`);
+            setMessage('An error occurred');
         }
     };
 
-    const handleRegister = async (e) => {
-        e.preventDefault();
-
-        try {
-            console.log(`Attempting to register with username: ${username}, password: ${password}`);
-            await axios.post('http://localhost:5001/user_register', { username, password });
-            setMessage('Registration successful');
-        } catch (error) {
-            setMessage('Username already exists!');
-        }
+    const togglePasswordVisibility = () => {
+        setShowPassword(!showPassword);
     };
 
     return (
         <Container>
-            <h2>Real-Time Chat</h2>
-            <Form onSubmit={handleLogin}>
+            <h2>{isRegistering ? 'Register' : 'Login'}</h2>
+            <Form onSubmit={handleFormSubmit}>
                 <Form.Group controlId="formUsername">
                     <Form.Label>Username</Form.Label>
                     <Form.Control
@@ -52,21 +50,28 @@ const AuthPage = ({ setToken }) => {
                 <Form.Group controlId="formPassword">
                     <Form.Label>Password</Form.Label>
                     <Form.Control
-                        type="password"
+                        type={showPassword ? "text" : "password"}
                         placeholder="Password"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         required
                     />
+                    <Form.Check
+                        type="checkbox"
+                        label="Show Password"
+                        onChange={togglePasswordVisibility}
+                    />
                 </Form.Group>
 
                 <Button variant="primary" type="submit">
-                    Login
-                </Button>
-                <Button variant="secondary" onClick={handleRegister}>
-                    Register
+                    {isRegistering ? 'Register' : 'Login'}
                 </Button>
             </Form>
+
+            <Button variant="link" onClick={() => setIsRegistering(!isRegistering)}>
+                {isRegistering ? 'Already have an account? Login' : 'Don\'t have an account? Register'}
+            </Button>
+
             {message && <p>{message}</p>}
         </Container>
     );

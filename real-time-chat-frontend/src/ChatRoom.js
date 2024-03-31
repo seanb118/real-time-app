@@ -1,28 +1,24 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Form, Button, ListGroup } from 'react-bootstrap';
-import { io } from 'socket.io-client';
-
-const socket = io('http://localhost:5001');
+import axios from 'axios';
 
 const ChatRoom = ({ username }) => {
     const [message, setMessage] = useState('');
     const [messages, setMessages] = useState([]);
 
-    useEffect(() => {
-        socket.on('message', (data) => {
-            setMessages((prevMessages) => [...prevMessages, data]);
-        });
+    const sendMessage = async (message) => {
+        const token = localStorage.getItem('token');
+        const endpoint = `http://localhost:5001/${username}/messages`;
 
-        return () => {
-            socket.off('message');
-        };
-    }, []);
-
-    const sendMessage = (e) => {
-        e.preventDefault();
-        if (message.trim() !== '') {
-            socket.emit('message', { message, username });
-            setMessage('');
+        try {
+            const response = await axios.post(endpoint, { message }, {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
+            console.log(response.data);
+        } catch (error) {
+            console.error(error);
         }
     };
 
@@ -39,7 +35,11 @@ const ChatRoom = ({ username }) => {
                     </ListGroup>
                 </Col>
                 <Col md={4}>
-                    <Form onSubmit={sendMessage}>
+                    <Form onSubmit={(e) => {
+                        e.preventDefault();
+                        sendMessage(message);
+                        setMessage('');
+                    }}>
                         <Form.Group>
                             <Form.Control
                                 type="text"
