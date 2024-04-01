@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, render_template
 from flask_socketio import SocketIO, send, emit
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager, jwt_required, create_access_token, get_jwt_identity
@@ -47,6 +47,19 @@ def user_register():
     users_collection.insert_one({'username': username, 'password': hashed_password})
 
     return jsonify({'message': 'User registered successfully!'}), 201
+
+
+@app.route('/<username>/mainpage')
+def main_page(username):
+    # Logic to render the main page with tabs for messages, contacts, and settings
+    return render_template('main_page.html', username=username)
+
+
+@app.route('/<username>/private-chats/<contact_id>')
+def private_chat(username, contact_id):
+    # Logic to display historic messages and enable private chats with contacts
+    return render_template('private_chat.html', username=username, contact_id=contact_id)
+
 
 
 @app.route('/login', methods=['POST'])
@@ -101,6 +114,18 @@ def handle_message():
 def get_token():
     # Logic to generate and return a JWT token
     return jsonify({'token': create_access_token(identity='test_user')})
+
+
+@app.route('/<username>/mainpage')
+def main_page(username):
+    # Logic to render the main page with tabs for messages, contacts, and settings
+    return render_template('main_page.html', username=username)
+
+
+@app.route('/<username>/private-chats/<contact_id>')
+def private_chat(username, contact_id):
+    # Logic to display historic messages and enable private chats with contacts
+    return render_template('private_chat.html', username=username, contact_id=contact_id)
 
 
 if __name__ == '__main__':
