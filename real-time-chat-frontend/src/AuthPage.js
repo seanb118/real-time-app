@@ -1,30 +1,32 @@
 import React, { useState } from 'react';
+import { Redirect } from 'react-router-dom';
 import { Container, Form, Button } from 'react-bootstrap';
 import axios from 'axios';
+import { useHistory } from 'react-router-dom';
 
 const AuthPage = ({ setToken }) => {
+    const history = useHistory();
+    const [loggedIn, setLoggedIn] = useState(false);
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [message, setMessage] = useState('');
     const [showPassword, setShowPassword] = useState(false);
     const [isRegistering, setIsRegistering] = useState(false);
 
-    const handleFormSubmit = async (e) => {
-        e.preventDefault();
-
+    const handleLogin = async () => {
         try {
             const endpoint = isRegistering ? 'user_register' : 'login';
             const response = await axios.post(`http://localhost:5001/${endpoint}`, { username, password });
-            const data = response.data;
-
             if (response.status === 200) {
+                const data = response.data;
                 setToken(data.access_token);
                 setMessage('Operation successful');
+                setLoggedIn(true); // If login/register is successful, set loggedIn to true
             } else {
-                setMessage(data.message);
+                setMessage(response.data.message);
             }
         } catch (error) {
-            setMessage('An error occurred');
+            setMessage('Operation unsuccessful');
         }
     };
 
@@ -32,10 +34,15 @@ const AuthPage = ({ setToken }) => {
         setShowPassword(!showPassword);
     };
 
+    if (loggedIn) {
+        // Redirect to the user's main page upon successful login/registration
+        return <Redirect to={`/${username}/mainpage`} />;
+    }
+
     return (
         <Container>
             <h2>{isRegistering ? 'Register' : 'Login'}</h2>
-            <Form onSubmit={handleFormSubmit}>
+            <Form onSubmit={(e) => { e.preventDefault(); handleLogin(); }}>
                 <Form.Group controlId="formUsername">
                     <Form.Label>Username</Form.Label>
                     <Form.Control

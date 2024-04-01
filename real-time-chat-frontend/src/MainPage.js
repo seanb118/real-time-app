@@ -1,13 +1,19 @@
 import React from 'react';
+import ContactList from './ContactList';
+import UserProfile from './UserProfile';
+import MessageDisplay from './MessageDisplay';
+import MessageInput from './MessageInput';
 
 const MainPage = ({ username }) => {
     return (
-        <div>
-            <h1>Welcome, {username}!</h1>
-            <div>
-                <button>Messages</button>
-                <button>Contacts</button>
-                <button>Settings</button>
+        <div className="main-page">
+            <UserProfile username={username} />
+            <div className="chat-container">
+                <ContactList />
+                <div className="message-area">
+                    <MessageDisplay />
+                    <MessageInput />
+                </div>
             </div>
         </div>
     );

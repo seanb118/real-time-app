@@ -49,19 +49,6 @@ def user_register():
     return jsonify({'message': 'User registered successfully!'}), 201
 
 
-@app.route('/<username>/mainpage')
-def main_page(username):
-    # Logic to render the main page with tabs for messages, contacts, and settings
-    return render_template('main_page.html', username=username)
-
-
-@app.route('/<username>/private-chats/<contact_id>')
-def private_chat(username, contact_id):
-    # Logic to display historic messages and enable private chats with contacts
-    return render_template('private_chat.html', username=username, contact_id=contact_id)
-
-
-
 @app.route('/login', methods=['POST'])
 def login():
     db = get_db()
@@ -120,7 +107,6 @@ def get_token():
 def main_page(username):
     # Logic to render the main page with tabs for messages, contacts, and settings
     return render_template('main_page.html', username=username)
-
 
 @app.route('/<username>/private-chats/<contact_id>')
 def private_chat(username, contact_id):
