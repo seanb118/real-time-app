@@ -10,8 +10,6 @@ import json
 class CustomJSONEncoder(json.JSONEncoder):
     def default(self, obj):
         # Custom JSON encoding logic
-        if isinstance(obj, YourCustomClass):
-            return obj.to_json()
         return super().default(obj)
 
 
