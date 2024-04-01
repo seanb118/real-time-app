@@ -1,11 +1,8 @@
 import React, { useState } from 'react';
-import { Redirect } from 'react-router-dom';
 import { Container, Form, Button } from 'react-bootstrap';
 import axios from 'axios';
-import { useHistory } from 'react-router-dom';
 
 const AuthPage = ({ setToken }) => {
-    const history = useHistory();
     const [loggedIn, setLoggedIn] = useState(false);
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
@@ -34,9 +31,9 @@ const AuthPage = ({ setToken }) => {
         setShowPassword(!showPassword);
     };
 
+    // Directly use loggedIn state for conditional redirection
     if (loggedIn) {
-        // Redirect to the user's main page upon successful login/registration
-        return <Redirect to={`/${username}/mainpage`} />;
+        window.location.href = `/${username}/mainpage`;
     }
 
     return (
